@@ -1,65 +1,63 @@
 import { useState } from "react";
 import "./App.css";
 
-import { getBrands, apiKey, getAnalogs } from "./api/favoritApi";
+import {
+  useLazyGetBrandsQuery,
+  useLazyGetAnalogsQuery,
+} from "./api/favoritApiSlice";
 
 function App() {
   const [article, setArticle] = useState("");
   const [brand, setBrand] = useState("");
-  const [brands, setBrands] = useState([]);
-  const [results, setResults] = useState([]);
-  const [isResultsLoading, setIsResultsLoading] = useState(false);
-  const [isBrandsLoading, setIsBrandsLoading] = useState(false);
-  const [resultsError, setResultsError] = useState("");
   const [hasSearchedBrands, setHasSearchedBrands] = useState(false);
   const [hasSearchedResults, setHasSearchedResults] = useState(false);
   const [brandsError, setBrandsError] = useState("");
+  const [trigger, { isFetching: isBrandsFetching, currentData: brandsData }] =
+    useLazyGetBrandsQuery();
+  const [
+    triggerAnalogs,
+    {
+      isFetching: isAnalogsFetching,
+      currentData: analogsData,
+      error: analogsError,
+    },
+  ] = useLazyGetAnalogsQuery();
+  const brands =
+    brandsData?.goods?.map((item) => item.brand).filter(Boolean) || [];
+  const results = analogsData?.goods?.[0]?.analogues || [];
 
   const handleArticleSubmit = async (event) => {
     event.preventDefault();
 
     setBrand("");
-    setBrands([]);
-    setResults([]);
-    setIsResultsLoading(false);
-    setResultsError("");
     setHasSearchedResults(false);
     setHasSearchedBrands(false);
     setBrandsError("");
-    setIsBrandsLoading(true);
-    console.log(article);
 
     try {
-      const data = await getBrands(apiKey, article);
-      setBrands(data.goods.map((item) => item.brand));
+      await trigger(article).unwrap();
       setHasSearchedBrands(true);
     } catch (error) {
       console.error("Ошибка загрузки производителей", error);
-      setBrandsError(error.message);
-    } finally {
-      setIsBrandsLoading(false);
+      setBrandsError(
+        error.data?.error ||
+          error.error ||
+          "Не удалось загрузить производителей",
+      );
     }
   };
 
   const handleBrandSubmit = async (event) => {
     event.preventDefault();
     if (!brand) return;
-    console.log(brand);
-    setIsResultsLoading(true);
-    setResultsError("");
-    setResults([]);
+
     setHasSearchedResults(false);
 
     try {
-      const data = await getAnalogs(apiKey, article, brand);
-      console.log(data);
-      setResults(data.goods?.[0]?.analogues ?? []);
+      await triggerAnalogs({ article, brand }).unwrap();
       setHasSearchedResults(true);
     } catch (error) {
       console.error("Ошибка загрузки аналогов", error);
-      setResultsError(error.message);
-    } finally {
-      setIsResultsLoading(false);
     }
   };
 
@@ -91,12 +89,12 @@ function App() {
             <button
               className="btn btn-primary"
               type="submit"
-              disabled={isBrandsLoading}
+              disabled={isBrandsFetching}
             >
               Найти
             </button>
           </form>
-          {isBrandsLoading && <div>Загрузка производителей...</div>}
+          {isBrandsFetching && <div>Загрузка производителей...</div>}
           {brandsError && <div>{brandsError}</div>}
         </div>
       </section>
@@ -132,13 +130,19 @@ function App() {
               <button
                 className="btn btn-primary"
                 type="submit"
-                disabled={!brand || isResultsLoading}
+                disabled={!brand || isAnalogsFetching}
               >
                 Показать аналоги
               </button>
             </form>
-            {isResultsLoading && <div>Загрузка...</div>}
-            {resultsError && <div className="text-danger">{resultsError}</div>}
+            {isAnalogsFetching && <div>Загрузка...</div>}
+            {analogsError && (
+              <div className="text-danger">
+                {analogsError.data?.error ||
+                  analogsError.error ||
+                  "Не удалось загрузить аналоги"}
+              </div>
+            )}
           </div>
         </section>
       )}
@@ -148,9 +152,9 @@ function App() {
 
       {results.length === 0 &&
         hasSearchedResults &&
-        !isResultsLoading &&
-        !resultsError && <div>По вашему запросу ничего не найдено</div>}
-      {results.length > 0 && (
+        !isAnalogsFetching &&
+        !analogsError && <div>По вашему запросу ничего не найдено</div>}
+      {hasSearchedResults && results.length > 0 && (
         <section className="card mt-4">
           <div className="card-body">
             <h2>Результаты поиска</h2>
