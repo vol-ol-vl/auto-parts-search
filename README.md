@@ -1,16 +1,47 @@
-# React + Vite
+# Поиск автозапчастей
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React-приложение для поиска автозапчастей и подбора аналогов с использованием API Favorit Parts.
 
-Currently, two official plugins are available:
+## Возможности
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Поиск производителей по артикулу детали.
+- Выбор производителя из полученного списка.
+- Получение аналогов выбранной детали.
+- Отображение информации о товарах: артикул, наименование и производитель.
+- Отображение предложений по складам, цен и остатков.
+- Обработка загрузки, ошибок API, сетевых ошибок и пустых результатов.
 
-## React Compiler
+## Технологии
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React
+- JavaScript
+- Redux Toolkit
+- RTK Query
+- Bootstrap
+- Vite
 
-## Expanding the ESLint configuration
+## Запуск проекта
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Клонировать репозиторий:
+
+    git clone https://github.com/vol-ol-vl/auto-parts-search.git
+
+Перейти в папку проекта:
+
+    cd auto-parts-search
+
+Установить зависимости:
+
+    npm install
+
+Запустить приложение:
+
+    npm run dev
+
+Для production-сборки:
+
+    npm run build
+
+## API
+
+Для получения данных приложение использует API Favorit Parts.
