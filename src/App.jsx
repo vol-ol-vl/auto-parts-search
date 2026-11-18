@@ -84,6 +84,7 @@ function App() {
                 placeholder="Введите артикул"
                 value={article}
                 onChange={(event) => setArticle(event.target.value)}
+                required
               />
             </div>
             <button
@@ -164,21 +165,42 @@ function App() {
                   <th scope="col">Артикул</th>
                   <th scope="col">Наименование</th>
                   <th scope="col">Производитель</th>
+                  <th scope="col">Склад</th>
                   <th scope="col">Цена</th>
                   <th scope="col">Наличие</th>
                 </tr>
               </thead>
               <tbody>
                 {results.map((item) => {
-                  return (
-                    <tr key={item.goodsID}>
-                      <td>{item.number}</td>
-                      <td>{item.name}</td>
-                      <td>{item.brand} </td>
-                      <td>{item.price}</td>
-                      <td>{item.count > 0 ? item.count : "Нет в наличии"}</td>
-                    </tr>
-                  );
+                  if (!item.warehouses?.length) {
+                    return (
+                      <tr key={item.goodsID}>
+                        <td>{item.number}</td>
+                        <td>{item.name}</td>
+                        <td>{item.brand}</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>Нет в наличии</td>
+                      </tr>
+                    );
+                  } else {
+                    return item.warehouses.map((warehouse) => {
+                      return (
+                        <tr key={warehouse.id}>
+                          <td>{item.number}</td>
+                          <td>{item.name}</td>
+                          <td>{item.brand}</td>
+                          <td>{warehouse.code}</td>
+                          <td>{warehouse.price}</td>
+                          <td>
+                            {warehouse.stock > 0
+                              ? warehouse.stock
+                              : "Нет в наличии"}
+                          </td>
+                        </tr>
+                      );
+                    });
+                  }
                 })}
               </tbody>
             </table>

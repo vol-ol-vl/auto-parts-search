@@ -2,7 +2,6 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 const apiUrl = "http://api.favorit-parts.ru/hs/hsprice/";
 const apiKey = "00000000-0000-0000-0000-000000000001";
-const apiKey2 = "no";
 
 const favoriteApi = createApi({
   reducerPath: "favoriteApi",
