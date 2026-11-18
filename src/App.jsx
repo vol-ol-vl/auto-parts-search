@@ -47,14 +47,20 @@ function App() {
     }
   };
 
-  const handleBrandSubmit = async (event) => {
-    event.preventDefault();
-    if (!brand) return;
+  const handleBrandChange = async (event) => {
+    const selectedBrand = event.target.value;
 
+    setBrand(selectedBrand);
     setHasSearchedResults(false);
 
+    if (!selectedBrand) return;
+
     try {
-      await triggerAnalogs({ article, brand }).unwrap();
+      await triggerAnalogs({
+        article,
+        brand: selectedBrand,
+      }).unwrap();
+
       setHasSearchedResults(true);
     } catch (error) {
       console.error("Ошибка загрузки аналогов", error);
@@ -104,38 +110,26 @@ function App() {
           <div className="card-body">
             <h2>Выбор производителя</h2>
 
-            <form
-              className="d-flex gap-2 flex-wrap align-items-end"
-              onSubmit={handleBrandSubmit}
-            >
-              <div className="flex-grow-1">
-                <label htmlFor="brand" className="form-label">
-                  Производитель
-                </label>
-                <select
-                  className="form-select"
-                  id="brand"
-                  value={brand}
-                  onChange={(event) => setBrand(event.target.value)}
-                >
-                  <option value="">Выберите производителя</option>
-                  {brands.map((brand) => {
-                    return (
-                      <option value={brand} key={brand}>
-                        {brand}
-                      </option>
-                    );
-                  })}
-                </select>
-              </div>
-              <button
-                className="btn btn-primary"
-                type="submit"
-                disabled={!brand || isAnalogsFetching}
+            <div className="flex-grow-1">
+              <label htmlFor="brand" className="form-label">
+                Производитель
+              </label>
+              <select
+                className="form-select"
+                id="brand"
+                value={brand}
+                onChange={handleBrandChange}
               >
-                Показать аналоги
-              </button>
-            </form>
+                <option value="">Выберите производителя</option>
+                {brands.map((brand) => {
+                  return (
+                    <option value={brand} key={brand}>
+                      {brand}
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
             {isAnalogsFetching && <div>Загрузка...</div>}
             {analogsError && (
               <div className="text-danger">
