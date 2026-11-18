@@ -20,6 +20,7 @@ function App() {
       isFetching: isAnalogsFetching,
       currentData: analogsData,
       error: analogsError,
+      reset: resetAnalogs,
     },
   ] = useLazyGetAnalogsQuery();
   const brands =
@@ -33,6 +34,7 @@ function App() {
     setHasSearchedResults(false);
     setHasSearchedBrands(false);
     setBrandsError("");
+    resetAnalogs();
 
     try {
       await trigger(article).unwrap();
@@ -41,8 +43,9 @@ function App() {
       console.error("Ошибка загрузки производителей", error);
       setBrandsError(
         error.data?.error ||
-          error.error ||
-          "Не удалось загрузить производителей",
+          (error.status === "FETCH_ERROR"
+            ? "Не удалось подключиться к серверу. Проверьте интернет-соединение."
+            : "Не удалось загрузить производителей"),
       );
     }
   };
@@ -134,8 +137,9 @@ function App() {
             {analogsError && (
               <div className="text-danger">
                 {analogsError.data?.error ||
-                  analogsError.error ||
-                  "Не удалось загрузить аналоги"}
+                  (analogsError.status === "FETCH_ERROR"
+                    ? "Не удалось подключиться к серверу. Проверьте интернет-соединение."
+                    : "Не удалось загрузить аналоги")}
               </div>
             )}
           </div>
